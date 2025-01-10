@@ -1,3 +1,9 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "mdutils==1.6.0",
+# ]
+# ///
 # NOTE: I wasted way too much time trying to do
 # this with PyGitHub but failed miserably with 'search'.
 # So, 'gh' CLI was the way to go.

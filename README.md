@@ -13,15 +13,8 @@ A simple script that automates the first paragraph of the 'Updates to Django' se
 gh auth login
 ```
 
-3. Then you can create a `venv` and install the dependencies:
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
 ## Usage
-Running `python main.py` without any args/kwargs will pull last week's (Monday until Sunday) merged PRs and will dump the output to an `OUT.md`.
+Running `uv run main.py` without any args/kwargs will pull last week's (Monday until Sunday) merged PRs and will dump the output to an `OUT.md`.
 
 Example `OUT.md`:
 ```md
