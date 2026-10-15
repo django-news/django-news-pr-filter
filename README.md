@@ -1,50 +1,78 @@
 # Django News PR Filter
 
-A simple script that automates the first paragraph of the 'Updates to Django' section for https://django-news.com.
+Drafts the "Updates to Django" section for https://django-news.com from the PRs merged into [django/django](https://github.com/django/django) during a week.
+
+It prints a Markdown block ready to paste into Buttondown:
+
+- the presenter line
+- the synopsis paragraph: how many PRs were merged, by how many contributors, and who the first-time contributors were
+- "News in Django X.Y:" bullets, taken from the release notes those PRs added to `docs/releases/*.txt`
 
 ## Installation
 
-1. This script uses the `gh` CLI to search and filter PRs. See [gh CLI installation instructions](https://github.com/cli/cli?tab=readme-ov-file#installation).
+1. Install [uv](https://docs.astral.sh/uv/) and the [`gh` CLI](https://github.com/cli/cli?tab=readme-ov-file#installation).
 
-
-2. After installing `gh` CLI, you'll have to authenticate with a GitHub host.
+2. Authenticate `gh` with GitHub:
 
 ```bash
 gh auth login
 ```
 
+There are no other dependencies.
+
 ## Usage
-Running `uv run main.py` without any args/kwargs will pull last week's (Monday until Sunday) merged PRs and will dump the output to an `OUT.md`.
 
-Example `OUT.md`:
+```bash
+uv run main.py | pbcopy
+```
+
+Without arguments, it covers last week (Monday until Sunday) and writes the Markdown to stdout. Progress and editor notes go to stderr, so they never end up in the copied text.
+
+Example output:
+
 ```md
-Updates to Django
-=============
+## Updates to Django
 
-# Synopsis
-Last week we had [15 pull requests](https://github.com/django/django/pulls?q=is%3Apr%20merged%3A2024-01-08..2024-01-14) merged into Django by 12 different contributors - including 3 first time contributors! Congratulations to [Waheedsys](https://github.com/Waheedsys), [evananyonga](https://github.com/evananyonga), and [dhalenok](https://github.com/dhalenok) for having their first commits merged into Django - welcome on board!  
+Today, "Updates to Django" is presented by [Raffaella](https://mastodon.social/@raffaellasuardini) from Djangonaut Space! 🚀
 
-# PRs that modified the release file
-- [https://github.com/django/django/pull/17718](https://github.com/django/django/pull/17718)  
-- [https://github.com/django/django/pull/17706](https://github.com/django/django/pull/17706)  
-- [https://github.com/django/django/pull/17700](https://github.com/django/django/pull/17700)  
+Last week we had [13 pull requests](https://github.com/django/django/pulls?q=is%3Apr%20merged%3A2026-09-28..2026-10-04) merged into Django by 11 different contributors - including 2 first-time contributors! Congratulations to [Juliana Nicacio](https://github.com/Mitchina) and [Max Azatian](https://github.com/HardMax71) for having their first commits merged into Django - welcome on board!
 
+News in Django 6.1:
+
+- [Fixed a bug](https://github.com/django/django/pull/22057) in Django 6.1 where the `UUID4` function persisted uppercase values on Oracle. ... ([#37376](https://code.djangoproject.com/ticket/37376)).
+- [Fixed a visual regression](https://github.com/django/django/pull/22054) in Django 6.1 where an extra empty breadcrumb was rendered on the admindocs model index page ([#37378](https://code.djangoproject.com/ticket/37378)).
 ```
 
+The bullets are a draft: they copy the release note wording, so trim or reword them and drop the ones that aren't newsworthy.
 
-Help menu:
+The editor notes on stderr list:
+
+- PRs that touched the release notes without adding a new note (typo fixes, reflowed old notes), in case one is worth a mention
+- long-running PRs, opened more than six months before the end of the week
+
+### Options
+
 ```
-usage: Django News PR Filter [-h] [-s START_DATE] [-e END_DATE] [-o OUTPUT_FILE] [-v]
+usage: django-news-pr-filter [-h] [-s START_DATE] [-e END_DATE] [-o OUTPUT_FILE] [--presenter PRESENTER]
+                             [--presenter-url PRESENTER_URL] [--presenter-org PRESENTER_ORG] [-v]
 
-Pulls info about the PRs merged into 'django/django' last week.
+  -s, --start-date      First day of merged PRs to include (default: last Monday).
+  -e, --end-date        Last day of merged PRs to include (default: last Sunday).
+  -o, --output-file     Write the Markdown to this file instead of stdout.
+  --presenter           Name in the presenter line (default: Raffaella).
+  --presenter-url       Link for the presenter's name.
+  --presenter-org       Presenter's organization (default: Djangonaut Space).
+  -v, --verbose         Log every `gh` call.
+```
 
-options:
-  -h, --help            show this help message and exit
-  -s START_DATE, --start_date START_DATE
-                        Filters merged PRs starting from `start_date`.e.g. 2024-01-28
-  -e END_DATE, --end_date END_DATE
-                        Filters merged PRs ending on `end_date`.e.g. 2024-01-28
-  -o OUTPUT_FILE, --output_file OUTPUT_FILE
-                        Specifies the location of the output .md file.
-  -v, --verbose
+## How it works
+
+- **Merged PRs:** one `gh pr list` search for `merged:START..END`.
+- **First-time contributors:** an author is a first-timer when they had no PR merged into Django before the start of the week (one GitHub search per author). People whose earlier contributions predate GitHub PRs can show up as first-timers, so give the names a glance.
+- **Release notes:** for each PR that touched `docs/releases/*.txt`, it reads the lines the PR added. Edits to existing notes are skipped, except for replacing the `* ...` placeholder. Section headings, code blocks, and directives are dropped. RST roles become Markdown: `:ticket:` and `:cve:` become links, and code roles like `:class:` become inline code. The opening words of each note link to its PR.
+
+## Tests
+
+```bash
+python3 -m unittest
 ```
