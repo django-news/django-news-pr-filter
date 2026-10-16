@@ -6,7 +6,7 @@ It prints a Markdown block ready to paste into Buttondown:
 
 - the presenter line, when you pass `--presenter`
 - the synopsis paragraph: how many PRs were merged, by how many contributors, and who the first-time contributors were
-- "News in Django X.Y:" bullets, taken from the release notes those PRs added to `docs/releases/*.txt`
+- "New in Django X.Y:" bullets, taken from the release notes those PRs added to `docs/releases/*.txt`
 
 ## Installation
 
@@ -35,7 +35,7 @@ Example output:
 
 Last week we had [13 pull requests](https://github.com/django/django/pulls?q=is%3Apr%20merged%3A2026-09-28..2026-10-04) merged into Django by 11 different contributors - including 2 first-time contributors! Congratulations to [Juliana Nicacio](https://github.com/Mitchina) and [Max Azatian](https://github.com/HardMax71) for having their first commits merged into Django - welcome on board!
 
-News in Django 6.1:
+New in Django 6.1:
 
 - [Fixed a bug](https://github.com/django/django/pull/22057) in Django 6.1 where the `UUID4` function persisted uppercase values on Oracle. ... ([#37376](https://code.djangoproject.com/ticket/37376)).
 - [Fixed a visual regression](https://github.com/django/django/pull/22054) in Django 6.1 where an extra empty breadcrumb was rendered on the admindocs model index page ([#37378](https://code.djangoproject.com/ticket/37378)).

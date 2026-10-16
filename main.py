@@ -11,7 +11,7 @@ with the `gh` CLI and prints a Markdown block ready to paste into Buttondown:
 
 - the presenter line, when --presenter is given
 - the synopsis paragraph (PR count, contributors, first-time contributors)
-- "News in Django X.Y:" bullets taken from the release notes those PRs added
+- "New in Django X.Y:" bullets taken from the release notes those PRs added
 
 Notes for the editor (PRs we could not turn into bullets, long-running PRs)
 are printed to stderr so they never end up in the newsletter.
@@ -324,7 +324,7 @@ def render(presenter_line: str | None, synopsis_text: str, notes: list[ReleaseNo
     )
     for version in versions:
         bullets = "\n".join(f"- {n.text}" for n in notes if n.version == version)
-        parts.append(f"News in Django {version}:\n\n{bullets}")
+        parts.append(f"New in Django {version}:\n\n{bullets}")
     return "\n\n".join(parts) + "\n"
 
 
