@@ -9,7 +9,7 @@ Drafts the "Updates to Django" section for https://django-news.com.
 Pulls the PRs merged into django/django during a week (Monday until Sunday)
 with the `gh` CLI and prints a Markdown block ready to paste into Buttondown:
 
-- the presenter line
+- the presenter line, when --presenter is given
 - the synopsis paragraph (PR count, contributors, first-time contributors)
 - "News in Django X.Y:" bullets taken from the release notes those PRs added
 
@@ -31,8 +31,6 @@ REPO = "django/django"
 PRS_LIMIT = 200
 RELEASE_NOTES_RE = re.compile(r"^docs/releases/(?P<version>\d+\.\d+(?:\.\d+)?)\.txt$")
 
-DEFAULT_PRESENTER = "Raffaella"
-DEFAULT_PRESENTER_URL = "https://mastodon.social/@raffaellasuardini"
 DEFAULT_PRESENTER_ORG = "Djangonaut Space"
 
 logger = logging.getLogger("django-news-pr-filter")
@@ -316,8 +314,9 @@ def synopsis(prs: list[PR], first_timers: list[Author], start, end) -> str:
     )
 
 
-def render(presenter_line: str, synopsis_text: str, notes: list[ReleaseNote]) -> str:
+def render(presenter_line: str | None, synopsis_text: str, notes: list[ReleaseNote]) -> str:
     parts = ["## Updates to Django", presenter_line, synopsis_text]
+    parts = [part for part in parts if part]
     versions = sorted(
         {note.version for note in notes},
         key=lambda v: tuple(int(n) for n in v.split(".")),
@@ -346,8 +345,9 @@ def main(argv=None) -> int:
                         help=f"Last day of merged PRs to include (default: {default_end}).")  # fmt: skip
     parser.add_argument("-o", "--output-file", "--output_file",
                         help="Write the Markdown to this file instead of stdout.")  # fmt: skip
-    parser.add_argument("--presenter", default=DEFAULT_PRESENTER)
-    parser.add_argument("--presenter-url", default=DEFAULT_PRESENTER_URL)
+    parser.add_argument("--presenter",
+                        help="Adds the 'presented by' line, e.g. --presenter Raffaella.")  # fmt: skip
+    parser.add_argument("--presenter-url")
     parser.add_argument("--presenter-org", default=DEFAULT_PRESENTER_ORG)
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args(argv)
@@ -371,7 +371,9 @@ def main(argv=None) -> int:
     notes, skipped = collect_release_notes(prs)
 
     markdown = render(
-        presenter_line(args.presenter, args.presenter_url, args.presenter_org),
+        presenter_line(args.presenter, args.presenter_url, args.presenter_org)
+        if args.presenter
+        else None,
         synopsis(prs, first_timers, start, end),
         notes,
     )

@@ -4,7 +4,7 @@ Drafts the "Updates to Django" section for https://django-news.com from the PRs 
 
 It prints a Markdown block ready to paste into Buttondown:
 
-- the presenter line
+- the presenter line, when you pass `--presenter`
 - the synopsis paragraph: how many PRs were merged, by how many contributors, and who the first-time contributors were
 - "News in Django X.Y:" bullets, taken from the release notes those PRs added to `docs/releases/*.txt`
 
@@ -33,8 +33,6 @@ Example output:
 ```md
 ## Updates to Django
 
-Today, "Updates to Django" is presented by [Raffaella](https://mastodon.social/@raffaellasuardini) from Djangonaut Space! 🚀
-
 Last week we had [13 pull requests](https://github.com/django/django/pulls?q=is%3Apr%20merged%3A2026-09-28..2026-10-04) merged into Django by 11 different contributors - including 2 first-time contributors! Congratulations to [Juliana Nicacio](https://github.com/Mitchina) and [Max Azatian](https://github.com/HardMax71) for having their first commits merged into Django - welcome on board!
 
 News in Django 6.1:
@@ -59,8 +57,8 @@ usage: django-news-pr-filter [-h] [-s START_DATE] [-e END_DATE] [-o OUTPUT_FILE]
   -s, --start-date      First day of merged PRs to include (default: last Monday).
   -e, --end-date        Last day of merged PRs to include (default: last Sunday).
   -o, --output-file     Write the Markdown to this file instead of stdout.
-  --presenter           Name in the presenter line (default: Raffaella).
-  --presenter-url       Link for the presenter's name.
+  --presenter           Adds the "presented by" line with this name, e.g. Raffaella.
+  --presenter-url       Link for the presenter's name, e.g. https://mastodon.social/@raffaellasuardini.
   --presenter-org       Presenter's organization (default: Djangonaut Space).
   -v, --verbose         Log every `gh` call.
 ```
