@@ -2,3 +2,4 @@ venv
 OUT.md
 .idea/
 __pycache__/
+.venv/

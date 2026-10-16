@@ -23,8 +23,10 @@ There are no other dependencies.
 ## Usage
 
 ```bash
-uv run main.py | pbcopy
+uv run django-news-pr-filter | pbcopy
 ```
+
+`uv run` creates the virtualenv and installs the package on first use. You can also install it as a tool with `uv tool install .` and run `django-news-pr-filter` directly.
 
 Without arguments, it covers last week (Monday until Sunday) and writes the Markdown to stdout. Progress and editor notes go to stderr, so they never end up in the copied text.
 
@@ -72,5 +74,5 @@ usage: django-news-pr-filter [-h] [-s START_DATE] [-e END_DATE] [-o OUTPUT_FILE]
 ## Tests
 
 ```bash
-python3 -m unittest
+uv run python -m unittest
 ```

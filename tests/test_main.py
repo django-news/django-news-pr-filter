@@ -1,7 +1,7 @@
 import datetime
 import unittest
 
-from main import (
+from django_news_pr_filter.main import (
     PR,
     Author,
     added_release_notes,
