@@ -9,5 +9,5 @@ The django-news fork of sakhawy/django-news-pr-filter. It is a `src`-layout pack
 
 ## Checks
 
-- `uv run python -m unittest` (offline tests; no network)
+- `uv run pytest` (offline tests; no network)
 - `uv run django-news-pr-filter -s 2026-09-28 -e 2026-10-04` should match the "Updates to Django" synopsis in Django News issue 358 (13 PRs, 11 contributors, 2 first-time contributors).

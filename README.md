@@ -74,5 +74,5 @@ usage: django-news-pr-filter [-h] [-s START_DATE] [-e END_DATE] [-o OUTPUT_FILE]
 ## Tests
 
 ```bash
-uv run python -m unittest
+uv run pytest
 ```
