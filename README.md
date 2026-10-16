@@ -18,7 +18,7 @@ It prints a Markdown block ready to paste into Buttondown:
 gh auth login
 ```
 
-There are no other dependencies.
+`uv run` installs the only Python dependency, [Typer](https://typer.tiangolo.com/), for you.
 
 ## Usage
 
@@ -53,8 +53,7 @@ The editor notes on stderr list:
 ### Options
 
 ```
-usage: django-news-pr-filter [-h] [-s START_DATE] [-e END_DATE] [-o OUTPUT_FILE] [--presenter PRESENTER]
-                             [--presenter-url PRESENTER_URL] [--presenter-org PRESENTER_ORG] [-v]
+Usage: django-news-pr-filter [OPTIONS]
 
   -s, --start-date      First day of merged PRs to include (default: last Monday).
   -e, --end-date        Last day of merged PRs to include (default: last Sunday).

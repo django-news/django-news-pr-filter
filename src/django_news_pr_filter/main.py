@@ -12,7 +12,6 @@ Notes for the editor (PRs we could not turn into bullets, long-running PRs)
 are printed to stderr so they never end up in the newsletter.
 """
 
-import argparse
 import dataclasses
 import datetime
 import json
@@ -21,6 +20,9 @@ import re
 import subprocess
 import sys
 import urllib.parse
+from typing import Annotated
+
+import typer
 
 REPO = "django/django"
 PRS_LIMIT = 200
@@ -74,9 +76,7 @@ def parse_date(value: str) -> datetime.date:
     try:
         return datetime.date.fromisoformat(value)
     except ValueError:
-        raise argparse.ArgumentTypeError(
-            f'Invalid date format {value}. Should be "YYYY-MM-DD".'
-        )
+        raise typer.BadParameter(f'Invalid date format {value}. Should be "YYYY-MM-DD".')
 
 
 def last_week(today: datetime.date) -> tuple[datetime.date, datetime.date]:
@@ -328,30 +328,44 @@ def presenter_line(name: str, url: str, org: str) -> str:
     return f'Today, "Updates to Django" is presented by {who} from {org}! 🚀'
 
 
-def main(argv=None) -> int:
+app = typer.Typer(add_completion=False)
+
+
+@app.command(
+    help="Drafts the 'Updates to Django' section from last week's merged PRs."
+)
+def main(
+    start_date: Annotated[
+        datetime.date | None,
+        typer.Option("--start-date", "--start_date", "-s", parser=parse_date, metavar="YYYY-MM-DD",
+                     help="First day of merged PRs to include (default: last Monday)."),
+    ] = None,
+    end_date: Annotated[
+        datetime.date | None,
+        typer.Option("--end-date", "--end_date", "-e", parser=parse_date, metavar="YYYY-MM-DD",
+                     help="Last day of merged PRs to include (default: last Sunday)."),
+    ] = None,
+    output_file: Annotated[
+        str | None,
+        typer.Option("--output-file", "--output_file", "-o",
+                     help="Write the Markdown to this file instead of stdout."),
+    ] = None,
+    presenter: Annotated[
+        str | None,
+        typer.Option(help="Adds the 'presented by' line, e.g. --presenter Raffaella."),
+    ] = None,
+    presenter_url: Annotated[str | None, typer.Option(help="Link for the presenter's name.")] = None,
+    presenter_org: Annotated[str, typer.Option(help="Presenter's organization.")] = DEFAULT_PRESENTER_ORG,
+    verbose: Annotated[bool, typer.Option("--verbose", "-v", help="Log every `gh` call.")] = False,
+) -> None:  # fmt: skip
     default_start, default_end = last_week(datetime.date.today())
-    parser = argparse.ArgumentParser(
-        prog="django-news-pr-filter",
-        description="Drafts the 'Updates to Django' section from last week's merged PRs.",
-    )
-    parser.add_argument("-s", "--start-date", "--start_date", type=parse_date, default=default_start,
-                        help=f"First day of merged PRs to include (default: {default_start}).")  # fmt: skip
-    parser.add_argument("-e", "--end-date", "--end_date", type=parse_date, default=default_end,
-                        help=f"Last day of merged PRs to include (default: {default_end}).")  # fmt: skip
-    parser.add_argument("-o", "--output-file", "--output_file",
-                        help="Write the Markdown to this file instead of stdout.")  # fmt: skip
-    parser.add_argument("--presenter",
-                        help="Adds the 'presented by' line, e.g. --presenter Raffaella.")  # fmt: skip
-    parser.add_argument("--presenter-url")
-    parser.add_argument("--presenter-org", default=DEFAULT_PRESENTER_ORG)
-    parser.add_argument("-v", "--verbose", action="store_true")
-    args = parser.parse_args(argv)
+    start = start_date or default_start
+    end = end_date or default_end
 
     logging.basicConfig(
         format="%(levelname)s: %(message)s",
-        level=logging.DEBUG if args.verbose else logging.INFO,
+        level=logging.DEBUG if verbose else logging.INFO,
     )
-    start, end = args.start_date, args.end_date
 
     logger.info("Loading PRs merged %s..%s", start, end)
     prs = fetch_prs(start, end)
@@ -366,16 +380,14 @@ def main(argv=None) -> int:
     notes, skipped = collect_release_notes(prs)
 
     markdown = render(
-        presenter_line(args.presenter, args.presenter_url, args.presenter_org)
-        if args.presenter
-        else None,
+        presenter_line(presenter, presenter_url, presenter_org) if presenter else None,
         synopsis(prs, first_timers, start, end),
         notes,
     )
-    if args.output_file:
-        with open(args.output_file, "w") as f:
+    if output_file:
+        with open(output_file, "w") as f:
             f.write(markdown)
-        logger.info("Wrote %s", args.output_file)
+        logger.info("Wrote %s", output_file)
     else:
         sys.stdout.write(markdown)
 
@@ -386,8 +398,7 @@ def main(argv=None) -> int:
     for pr in prs:
         if pr.created < six_months_ago:
             logger.info("Long-running PR (opened %s): %s %s", pr.created, pr.url, pr.title)
-    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    app()

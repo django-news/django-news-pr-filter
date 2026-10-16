@@ -4,10 +4,12 @@ version = "0.1.0"
 description = 'Drafts the "Updates to Django" section of the Django News newsletter.'
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "typer>=0.27.3",
+]
 
 [project.scripts]
-django-news-pr-filter = "django_news_pr_filter.main:main"
+django-news-pr-filter = "django_news_pr_filter.main:app"
 
 [build-system]
 requires = ["uv_build>=0.8,<0.14"]

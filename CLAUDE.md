@@ -1,6 +1,6 @@
 # django-news-pr-filter
 
-The django-news fork of sakhawy/django-news-pr-filter. It is a `src`-layout package (`src/django_news_pr_filter/main.py`, tests in `tests/`) with no dependencies beyond the `gh` CLI; it drafts the "Updates to Django" section of the Django News newsletter.
+The django-news fork of sakhawy/django-news-pr-filter. It is a `src`-layout package (`src/django_news_pr_filter/main.py`, tests in `tests/`) with a Typer CLI that shells out to the `gh` CLI; it drafts the "Updates to Django" section of the Django News newsletter.
 
 ## Commits and branches
 
